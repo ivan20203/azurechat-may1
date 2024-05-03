@@ -5,6 +5,8 @@ import {
   ClipboardIcon,
   PocketKnife,
   UserCircle,
+  Volume2,
+  Pause
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarImage } from "../../avatar";
@@ -18,10 +20,15 @@ export const ChatMessageArea = (props: {
   onCopy: () => void;
 }) => {
   const [isIconChecked, setIsIconChecked] = useState(false);
+  const [isTTSmode, setTTSmode] = useState(false);
 
   const handleButtonClick = () => {
     props.onCopy();
     setIsIconChecked(true);
+  };
+
+  const handleTTSClick = () => {
+    setTTSmode(!isTTSmode);
   };
 
   useEffect(() => {
@@ -86,6 +93,21 @@ export const ChatMessageArea = (props: {
         <div className=" h-7 flex items-center justify-between">
           <div>
             <Button
+              variant={"ghost"}
+              size={"sm"}
+              title="Speak content"
+              className="justify-right flex"
+              onClick={handleTTSClick}
+            >
+              {isTTSmode ? (
+                <Pause size={16} />
+              ) : (
+                <Volume2 size={16} />
+              )}
+            </Button>
+          </div>
+          <div>
+          <Button
               variant={"ghost"}
               size={"sm"}
               title="Copy text"

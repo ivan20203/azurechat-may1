@@ -48,11 +48,15 @@ export const MainMenu = async () => {
               <PocketKnife {...menuIconProps} />
             </MenuLink>
           </MenuItem>
-          <MenuItem tooltip="prompts">
+
+{/*  Prompts functionality does not work for me */}
+
+          {/* <MenuItem tooltip="prompts">
             <MenuLink href="/prompt" ariaLabel="Go to the Prompt Library configuration page">
               <Book {...menuIconProps} />
             </MenuLink>
-          </MenuItem>
+          </MenuItem> */}
+          
           {user.isAdmin && (
             <>
               <MenuItem tooltip="reporting">
