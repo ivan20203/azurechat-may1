@@ -36,12 +36,12 @@ export async function synthesizeSpeech(text:any) {
 
 //speed = 
 
-export async function synthesizeSpeech2(text:any, emotion = 'sad', speed = '+80%') {
+export async function synthesizeSpeech2(text:any, emotion = 'sad', speed = '+80%', voice = 'en-US-DavisNeural') {
   const key = process.env.AZURE_SPEECH_KEY;
   const region = process.env.AZURE_SPEECH_REGION;
   const speechConfig = sdk.SpeechConfig.fromSubscription(key, region);
   speechConfig.speechSynthesisLanguage = "en-US";
-  speechConfig.speechSynthesisVoiceName = "en-US-DavisNeural";
+  speechConfig.speechSynthesisVoiceName = voice;
   const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig);
 
   if (!text) {

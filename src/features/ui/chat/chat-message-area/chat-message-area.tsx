@@ -13,6 +13,7 @@ import { Avatar, AvatarImage } from "../../avatar";
 import { Button } from "../../button";
 import {synthesizeSpeech, synthesizeSpeech2 } from "./tts";
 
+import {getProfileSettings} from "../../../chat-page/chat-services/chat-tts-setting"
 
 export const ChatMessageArea = (props: {
   children?: React.ReactNode;
@@ -26,10 +27,12 @@ export const ChatMessageArea = (props: {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     props.onCopy();
     setIsIconChecked(true);
   };
+
+
 
   const playAudio2 = (base64AudioData:any) => {
     // Decode and play audio similar to your existing function
@@ -69,12 +72,36 @@ export const ChatMessageArea = (props: {
       if (!props.children || typeof props.children !== 'object' || !('props' in props.children)) {
         return;
       }
+      const response = await getProfileSettings() as any;
+      
+      const speed = response.response.settings.ttsSpeed;
+      const emotion = response.response.settings.ttsEmotion;
+      const voice = response.response.settings.ttsVoice;
 
-      const val = await synthesizeSpeech2(props.children.props.message.content);
+      const rawContent = props.children.props.message.content;
+
+      const content = convertCodeToPlainText(rawContent);
+      console.log(content);
+
+      const val = await synthesizeSpeech2(content
+        ,emotion,speed,voice
+      );
       playAudio2(val);
       setTTSmode(true);
     }
   };
+
+
+  function convertCodeToPlainText(input:any) {
+    if (typeof input !== 'string') {
+      input = JSON.stringify(input);
+    }
+    return input
+      .replace(/<[^>]*>/g, '') // Strip HTML tags or similar structures
+      .replace(/\s+/g, ' ') // Replace newlines, tabs, multiple spaces with a single space
+      .trim(); // Trim whitespace from start and end
+  }
+
 
 /*
   this allows you to pause in the middle. 
