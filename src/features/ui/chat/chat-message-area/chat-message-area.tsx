@@ -55,7 +55,7 @@ export const ChatMessageArea = (props: {
   const handleTTSClick = async () => {
     if(!isTTSmode){
 
-      if(!props.children){
+      if (!props.children || typeof props.children !== 'object' || !('props' in props.children)) {
         return;
       }
       
