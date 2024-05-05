@@ -8,10 +8,11 @@ import {
   Volume2,
   Pause
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 import { Avatar, AvatarImage } from "../../avatar";
 import { Button } from "../../button";
-import {synthesizeSpeech } from "./tts";
+import {synthesizeSpeech, synthesizeSpeech2 } from "./tts";
+
 
 export const ChatMessageArea = (props: {
   children?: React.ReactNode;
@@ -22,6 +23,8 @@ export const ChatMessageArea = (props: {
 }) => {
   const [isIconChecked, setIsIconChecked] = useState(false);
   const [isTTSmode, setTTSmode] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
 
   const handleButtonClick = () => {
     props.onCopy();
@@ -29,42 +32,81 @@ export const ChatMessageArea = (props: {
   };
 
   const playAudio2 = (base64AudioData:any) => {
-    // Decode the base64 string to binary data
+    // Decode and play audio similar to your existing function
     const binaryString = window.atob(base64AudioData);
     const len = binaryString.length;
     const bytes = new Uint8Array(len);
     for (let i = 0; i < len; i++) {
       bytes[i] = binaryString.charCodeAt(i);
     }
-  
-    // Create a blob from the binary data
+
     const audioBlob = new Blob([bytes.buffer], { type: 'audio/wav' });
     const audioUrl = URL.createObjectURL(audioBlob);
+    
+    // Use the audioRef to control the audio
     const audio = new Audio(audioUrl);
-  
-    // Play the audio
+    audioRef.current = audio;  // Set the audio object to the ref
     audio.play();
-  
-    // Clean up after playback
+
     audio.onended = () => {
       URL.revokeObjectURL(audioUrl);
+      setTTSmode(false); // Reset TTS mode after audio ends
     };
   };
+
   
   
   const handleTTSClick = async () => {
-    if(!isTTSmode){
-
+    if (isTTSmode) {
+      // If already playing, stop and reset
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0; // Reset audio to start
+        URL.revokeObjectURL(audioRef.current.src); // Clean up the object URL
+      }
+      setTTSmode(false);
+    } else {
       if (!props.children || typeof props.children !== 'object' || !('props' in props.children)) {
         return;
       }
-      
-      const val = await synthesizeSpeech(props.children.props.message.content);
+
+      const val = await synthesizeSpeech2(props.children.props.message.content);
       playAudio2(val);
-      setTTSmode(false);
+      setTTSmode(true);
     }
-    setTTSmode(!isTTSmode);
   };
+
+/*
+  this allows you to pause in the middle. 
+  problem is that you wont be able to do TTS on other 
+  messages until the first paused message has ran through. 
+
+  const handleTTSClick = async () => {
+    if (isTTSmode) {
+      // If already playing, just pause
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setTTSmode(false);
+      }
+    } else {
+      if (audioRef.current) {
+        // Resume the audio if it's already loaded
+        audioRef.current.play();
+        setTTSmode(true);
+      } else {
+        // Handle case where audio hasn't been loaded yet
+        if (!props.children || typeof props.children !== 'object' || !('props' in props.children)) {
+          return;
+        }
+        const val = await synthesizeSpeech(props.children.props.message.content);
+        playAudio2(val);
+        setTTSmode(true);
+      }
+    }
+  };
+  */
+
+
 
   useEffect(() => {
     const timeout = setTimeout(() => {
