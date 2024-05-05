@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { Avatar, AvatarImage } from "../../avatar";
 import { Button } from "../../button";
+import {synthesizeSpeech } from "./tts";
 
 export const ChatMessageArea = (props: {
   children?: React.ReactNode;
@@ -27,7 +28,41 @@ export const ChatMessageArea = (props: {
     setIsIconChecked(true);
   };
 
-  const handleTTSClick = () => {
+  const playAudio2 = (base64AudioData:any) => {
+    // Decode the base64 string to binary data
+    const binaryString = window.atob(base64AudioData);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+  
+    // Create a blob from the binary data
+    const audioBlob = new Blob([bytes.buffer], { type: 'audio/wav' });
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+  
+    // Play the audio
+    audio.play();
+  
+    // Clean up after playback
+    audio.onended = () => {
+      URL.revokeObjectURL(audioUrl);
+    };
+  };
+  
+  
+  const handleTTSClick = async () => {
+    if(!isTTSmode){
+
+      if(!props.children){
+        return;
+      }
+      
+      const val = await synthesizeSpeech(props.children.props.message.content);
+      playAudio2(val);
+      setTTSmode(false);
+    }
     setTTSmode(!isTTSmode);
   };
 
@@ -131,3 +166,81 @@ export const ChatMessageArea = (props: {
     </div>
   );
 };
+
+
+
+/** old code
+ * 
+ * 
+ * //   const func = async () => {
+//     const key = await create();
+//     const region = await create2();
+
+//     const speechConfig = sdk.SpeechConfig.fromSubscription(key, region);
+
+//     speechConfig.speechSynthesisLanguage = "en-US"; 
+//     speechConfig.speechSynthesisVoiceName = "en-US-DavisNeural";
+
+//     const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig);
+    
+//     if(!props.children){
+//       return;
+//     }
+
+//     console.log(props.children);
+//     console.log(props);
+//     const text = props.children.props.message.content;
+
+//     speechSynthesizer.speakTextAsync(
+//         text,
+//         result => {
+//             speechSynthesizer.close();
+//             return result.audioData;
+
+//         },
+//         error => {
+//             console.log(error);
+//             speechSynthesizer.close();
+//         });
+// }
+ * 
+ * 
+ *   const playAudio = (audioData) => {
+    const audioBlob = new Blob([audioData], { type: 'audio/wav' });
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    audio.play();
+    audio.onended = () => {
+      URL.revokeObjectURL(audioUrl);
+    };
+  };
+ * 
+  const func2 = async () => {
+    const key = await create();
+    const region = await create2();
+    const speechConfig = sdk.SpeechConfig.fromSubscription(key, region);
+    speechConfig.speechSynthesisLanguage = "en-US";
+    speechConfig.speechSynthesisVoiceName = "en-US-DavisNeural";
+    const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig);
+
+    if (!props.children) {
+      return;
+    }
+
+    const text = props.children.props.message.content;
+
+    speechSynthesizer.speakTextAsync(
+      text,
+      result => {
+        speechSynthesizer.close();
+        
+        //playAudio(result.audioData);
+      },
+      error => {
+        console.log(error);
+        speechSynthesizer.close();
+      });
+  }
+
+
+ */
