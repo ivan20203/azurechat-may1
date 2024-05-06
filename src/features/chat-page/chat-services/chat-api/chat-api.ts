@@ -18,7 +18,7 @@ import { GetDynamicExtensions } from "./chat-api-dynamic-extensions";
 import { ChatApiExtensions } from "./chat-api-extension";
 import { ChatApiMultimodal } from "./chat-api-multimodal";
 import { OpenAIStream } from "./open-ai-stream";
-type ChatTypes = "extensions" | "chat-with-file" | "multimodal";
+type ChatTypes = "extensions" | "chat-with-file" | "multimodal" | "video";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   const currentChatThreadResponse = await EnsureChatThreadOperation(props.id);
@@ -61,6 +61,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
     role: "user",
     chatThreadId: currentChatThread.id,
     multiModalImage: props.multimodalImage,
+    video:props.video
   });
 
   let runner: ChatCompletionStreamingRunner;

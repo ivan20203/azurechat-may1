@@ -16,6 +16,7 @@ interface MessageContentProps {
     content: string;
     name: string;
     multiModalImage?: string;
+    video?:string;
   };
 }
 
@@ -28,6 +29,8 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
           onCitationClick={CitationAction}
         ></Markdown>
         {message.multiModalImage && <img src={message.multiModalImage} />}
+        {message.video && <img src={message.video} />}
+
       </>
     );
   }

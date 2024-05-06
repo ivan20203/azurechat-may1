@@ -134,6 +134,7 @@ class ChatState {
     this.loading = "loading";
 
     const multimodalImage = formData.get("image-base64") as unknown as string;
+    const video = formData.get("image-base64") as unknown as string;
 
     const newUserMessage: ChatMessageModel = {
       id: uniqueId(),
@@ -141,6 +142,7 @@ class ChatState {
       content: this.input,
       name: this.userName,
       multiModalImage: multimodalImage,
+      video:video,
       createdAt: new Date(),
       isDeleted: false,
       threadId: this.chatThreadId,

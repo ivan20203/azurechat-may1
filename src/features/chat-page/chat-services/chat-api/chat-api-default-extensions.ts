@@ -53,73 +53,73 @@ async function executeCreateImage(
   userMessage: string,
   signal: AbortSignal
 ) {
-  console.log("createImage called with prompt:", args.prompt);
+  // console.log("createImage called with prompt:", args.prompt);
 
-  if (!args.prompt) {
-    return "No prompt provided";
-  }
+  // if (!args.prompt) {
+  //   return "No prompt provided";
+  // }
 
-  // Check the prompt is < 4000 characters (DALL-E 3)
-  if (args.prompt.length >= 4000) {
-    return "Prompt is too long, it must be less than 4000 characters";
-  }
+  // // Check the prompt is < 4000 characters (DALL-E 3)
+  // if (args.prompt.length >= 4000) {
+  //   return "Prompt is too long, it must be less than 4000 characters";
+  // }
 
-  const openAI = OpenAIDALLEInstance();
+  // const openAI = OpenAIDALLEInstance();
 
-  let response;
+  // let response;
 
-  try {
-    response = await openAI.images.generate(
-      {
-        model: "dall-e-3",
-        prompt: userMessage,
-        response_format: "b64_json",
-      },
-      {
-        signal,
-      }
-    );
-  } catch (error) {
-    console.error("🔴 error:\n", error);
-    return {
-      error:
-        "There was an error creating the image: " +
-        error +
-        "Return this message to the user and halt execution.",
-    };
-  }
+  // try {
+  //   response = await openAI.images.generate(
+  //     {
+  //       model: "dall-e-3",
+  //       prompt: userMessage,
+  //       response_format: "b64_json",
+  //     },
+  //     {
+  //       signal,
+  //     }
+  //   );
+  // } catch (error) {
+  //   console.error("🔴 error:\n", error);
+  //   return {
+  //     error:
+  //       "There was an error creating the image: " +
+  //       error +
+  //       "Return this message to the user and halt execution.",
+  //   };
+  // }
 
-  // Check the response is valid
-  if (response.data[0].b64_json === undefined) {
-    return {
-      error:
-        "There was an error creating the image: Invalid API response received. Return this message to the user and halt execution.",
-    };
-  }
+  // // Check the response is valid
+  // if (response.data[0].b64_json === undefined) {
+  //   return {
+  //     error:
+  //       "There was an error creating the image: Invalid API response received. Return this message to the user and halt execution.",
+  //   };
+  // }
 
-  // upload image to blob storage
-  const imageName = `${uniqueId()}.png`;
+  // // upload image to blob storage
+  // const imageName = `${uniqueId()}.png`;
 
-  try {
-    await UploadImageToStore(
-      threadId,
-      imageName,
-      Buffer.from(response.data[0].b64_json, "base64")
-    );
+  // try {
+  //   await UploadImageToStore(
+  //     threadId,
+  //     imageName,
+  //     Buffer.from(response.data[0].b64_json, "base64")
+  //   );
 
-    const updated_response = {
-      revised_prompt: response.data[0].revised_prompt,
-      url: GetImageUrl(threadId, imageName),
-    };
+  //   const updated_response = {
+  //     revised_prompt: response.data[0].revised_prompt,
+  //     url: GetImageUrl(threadId, imageName),
+  //   };
 
-    return updated_response;
-  } catch (error) {
-    console.error("🔴 error:\n", error);
-    return {
-      error:
-        "There was an error storing the image: " +
-        error +
-        "Return this message to the user and halt execution.",
-    };
-  }
+  //   return updated_response;
+  // } catch (error) {
+  //   console.error("🔴 error:\n", error);
+  //   return {
+  //     error:
+  //       "There was an error storing the image: " +
+  //       error +
+  //       "Return this message to the user and halt execution.",
+  //   };
+  // }
 }

@@ -16,6 +16,7 @@ export interface ChatMessageModel {
   role: ChatRole;
   name: string;
   multiModalImage?: string;
+  video?:string;
   type: typeof MESSAGE_ATTRIBUTE;
 }
 
@@ -40,6 +41,7 @@ export interface UserPrompt {
   id: string; // thread id
   message: string;
   multimodalImage: string;
+  video:string;
 }
 
 export interface ChatDocumentModel {
