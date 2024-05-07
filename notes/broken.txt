@@ -7,3 +7,7 @@ Prompt Library
 Slow gpt 4 vision analysis. 
 
 Math. it just gives latex, needs to give nice visuals like mathjax ??
+
+cannot generate images, but tries to. 
+
+multimodal images are only consumed once, no context

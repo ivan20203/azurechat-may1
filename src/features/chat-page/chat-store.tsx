@@ -134,7 +134,9 @@ class ChatState {
     this.loading = "loading";
 
     const multimodalImage = formData.get("image-base64") as unknown as string;
-    const video = formData.get("image-base64") as unknown as string;
+    let video = formData.get("video") as string;
+
+
 
     const newUserMessage: ChatMessageModel = {
       id: uniqueId(),
@@ -184,6 +186,7 @@ class ChatState {
                 type: "CHAT_MESSAGE",
                 userId: "",
                 multiModalImage: "",
+                video:""
               };
               this.addToMessages(mappedFunction);
               break;
@@ -199,6 +202,7 @@ class ChatState {
                 type: "CHAT_MESSAGE",
                 userId: "",
                 multiModalImage: "",
+                video:""
               };
               this.addToMessages(mappedFunctionResult);
               break;
@@ -214,6 +218,7 @@ class ChatState {
                 type: "CHAT_MESSAGE",
                 userId: "",
                 multiModalImage: "",
+                video:""
               };
 
               this.addToMessages(mappedContent);

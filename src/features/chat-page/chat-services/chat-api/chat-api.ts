@@ -18,6 +18,9 @@ import { GetDynamicExtensions } from "./chat-api-dynamic-extensions";
 import { ChatApiExtensions } from "./chat-api-extension";
 import { ChatApiMultimodal } from "./chat-api-multimodal";
 import { OpenAIStream } from "./open-ai-stream";
+
+import { handleVideoInput } from "./chat-api-video";
+
 type ChatTypes = "extensions" | "chat-with-file" | "multimodal" | "video";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
@@ -46,7 +49,9 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
 
   let chatType: ChatTypes = "extensions";
 
-  if (props.multimodalImage && props.multimodalImage.length > 0) {
+  if (props.video && props.video.length > 0) {
+    chatType = "video"; // New chat type for video
+  } else if (props.multimodalImage && props.multimodalImage.length > 0) {
     chatType = "multimodal";
   } else if (docs.length > 0) {
     chatType = "chat-with-file";
@@ -67,6 +72,14 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   let runner: ChatCompletionStreamingRunner;
 
   switch (chatType) {
+    case "video":
+      runner = await handleVideoInput({
+        chatThread: currentChatThread,
+        userMessage: props.message,
+        video: props.video,
+        signal: signal,
+      });
+      break;
     case "chat-with-file":
       runner = await ChatApiRAG({
         chatThread: currentChatThread,
