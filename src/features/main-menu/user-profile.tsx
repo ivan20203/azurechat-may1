@@ -13,9 +13,24 @@ import { CircleUserRound, LogOut } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { ThemeToggle } from "./theme-toggle";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import {upsertProfileSettings} from "../chat-page/chat-services/chat-tts-setting"
+
+const voiceToEmotions: {
+  [key: string]: string[];
+} = {
+  "en-US-AriaNeural": ["angry", "chat", "cheerful", "customerservice", "empathetic", "excited", "friendly", "hopeful", "narration-professional", "newscast-casual", "newscast-formal", "sad", "shouting", "terrified", "unfriendly", "whispering"],
+  "en-US-DavisNeural": ["angry", "chat", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"],
+  "en-US-GuyNeural": ["angry", "cheerful", "excited", "friendly", "hopeful", "newscast", "sad", "shouting", "terrified", "unfriendly", "whispering"],
+  "en-US-JaneNeural": ["angry", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"],
+  "en-US-JasonNeural": ["angry", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"],
+  "en-US-JennyNeural": ["angry", "assistant", "chat", "cheerful", "customerservice", "excited", "friendly", "hopeful", "newscast", "sad", "shouting", "terrified", "unfriendly", "whispering"],
+  "en-US-NancyNeural": ["angry", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"],
+  "en-US-SaraNeural": ["angry", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"],
+  "en-US-TonyNeural": ["angry", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"]
+};
+
 
 export const UserProfile = () => {
   const { data: session } = useSession();
@@ -23,6 +38,13 @@ export const UserProfile = () => {
   const [speed, setSpeed] = useState('+0%');
   const [voice, setVoice] = useState('');
   const [emotion, setEmotion] = useState('');
+  const [availableEmotions, setAvailableEmotions] = useState<string[]>([]);
+
+  useEffect(() => {
+    const emotions = voiceToEmotions[voice] || [];
+    setAvailableEmotions(emotions);
+  }, [voice]);
+  
 
   const handleUpdateSettings = async () => {
     await upsertProfileSettings({
@@ -37,11 +59,8 @@ export const UserProfile = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {session?.user?.image ? (
-          <Avatar className="">
-            <AvatarImage
-              src={session?.user?.image!}
-              alt={session?.user?.name!}
-            />
+          <Avatar>
+            <AvatarImage src={session.user.image}  />
           </Avatar>
         ) : (
           <CircleUserRound {...menuIconProps} role="button" />
@@ -50,15 +69,9 @@ export const UserProfile = () => {
       <DropdownMenuContent side="right" className="w-56" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-medium leading-none">
-              {session?.user?.name}
-            </p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {session?.user?.email}
-            </p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {session?.user?.isAdmin ? "Admin" : ""}
-            </p>
+            <p className="text-sm font-medium leading-none">{session?.user?.name}</p>
+            <p className="text-xs leading-none text-muted-foreground">{session?.user?.email}</p>
+            <p className="text-xs leading-none text-muted-foreground">{session?.user?.isAdmin ? "Admin" : ""}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -68,43 +81,26 @@ export const UserProfile = () => {
             <ThemeToggle />
           </div>
         </DropdownMenuLabel>
-
         <DropdownMenuLabel className="font-normal">
-  <div className="flex flex-col gap-1">
-    <p className="text-sm font-medium leading-none">TTS Settings</p>
-    <select className="text-sm" value={speed} onChange={(e) => setSpeed(e.target.value)}>
-      <option value="+0%">+0%</option>
-      <option value="+10%">+10%</option>
-      <option value="+30%">+30%</option>
-      <option value="+50%">+50%</option>
-      <option value="+60%">+60%</option>
-      <option value="+70%">+70%</option>
-      <option value="+85%">+85%</option>
-      <option value="+100%">+100%</option>
-    </select>
-    <select className="text-sm" value={voice} onChange={(e) => setVoice(e.target.value)}>
-      <option value="">Select Voice</option>
-      <option value="en-US-DavisNeural">en-US-DavisNeural</option>
-      <option value="en-US-JennyNeural">en-US-JennyNeural</option>
-      <option value="en-US-AriaNeural">en-US-AriaNeural</option>
-      <option value="en-US-GuyNeural">en-US-GuyNeural</option>
-    </select>
-    <select className="text-sm" value={emotion} onChange={(e) => setEmotion(e.target.value)}>
-      <option value="">Select Emotion</option>
-      <option value="Cheerful">Cheerful</option>
-      <option value="Sad">Sad</option>
-      <option value="Excited">Terrified</option>
-    </select>
-    <button onClick={handleUpdateSettings} className="mt-2">Update Settings</button>
-  </div>
-</DropdownMenuLabel>
-
-
+          <div className="flex flex-col gap-1">
+            <p className="text-sm font-medium leading-none">TTS Settings</p>
+            <select className="text-sm" value={speed} onChange={(e) => setSpeed(e.target.value)}>
+              {/* Speed options */}
+              {["+0%", "+10%", "+30%", "+50%", "+60%", "+70%", "+85%", "+100%"].map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+            <select className="text-sm" value={voice} onChange={(e) => setVoice(e.target.value)}>
+              <option value="">Select Voice</option>
+              {Object.keys(voiceToEmotions).map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+            <select className="text-sm" value={emotion} onChange={(e) => setEmotion(e.target.value)}>
+              <option value="">Select Emotion</option>
+              {availableEmotions.map(e => <option key={e} value={e}>{e}</option>)}
+            </select>
+            <button onClick={handleUpdateSettings} className="mt-2">Update Settings</button>
+          </div>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="flex gap-2"
-          onClick={() => signOut({ callbackUrl: "/" })}
-        >
+        <DropdownMenuItem className="flex gap-2" onClick={() => signOut({ callbackUrl: "/" })}>
           <LogOut {...menuIconProps} size={18} />
           <span>Log out</span>
         </DropdownMenuItem>
