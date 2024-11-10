@@ -78,11 +78,12 @@ export const ChatInput = () => {
       />
       <ChatInputActionArea>
         <ChatInputSecondaryActionArea>
-          <AttachFile
+
+          {/* <AttachFile
             onClick={(formData) =>
               fileStore.onFileChange({ formData, chatThreadId })
             }
-          />
+          /> */}
   {/* 
   Prompts are not currently working for me. 
   */}
@@ -91,8 +92,9 @@ export const ChatInput = () => {
           
         </ChatInputSecondaryActionArea>
         <ChatInputPrimaryActionArea>
-          <ImageInput />
-          <VideoInput />
+          
+          {/* <ImageInput /> */}
+          {/* <VideoInput /> */}
 {/* 
   Microphone is not currently working for me. 
   */}
